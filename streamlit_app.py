@@ -81,11 +81,14 @@ def parse_and_generate_graphs_as_datauri(input_text: str):
 
 
 
+st.write("Streamlit loves LLMs! 🤖 [Build your own chat app](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps) in minutes, then make it powerful by adding images, dataframes, or even input widgets to the chat.")
+
+st.caption("Note that this demo app isn't actually connected to any LLMs. Those are expensive ;)")
 
 
 
 
-
+# Initialize chat history
 if "messages" not in st.session_state:
     preprompt="""
     You are an AI that chats with users and is able to show line graphs when needed.
@@ -111,17 +114,10 @@ if "messages" not in st.session_state:
     """
     st.session_state.messages = [{"role": "assistant", "content": preprompt}]
 
-
-st.write("Streamlit loves LLMs! 🤖 [Build your own chat app](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps) in minutes, then make it powerful by adding images, dataframes, or even input widgets to the chat.")
-
-st.caption("Note that this demo app isn't actually connected to any LLMs. Those are expensive ;)")
-
-# Initialize chat history
-if "messages" not in st.session_state:
-    st.session_state.messages = [{"role": "assistant", "content": "Let's start chatting! 👇"}]
+    #st.session_state.messages = [{"role": "assistant", "content": "Let's start chatting! 👇"}]
 
 # Display chat messages from history on app rerun
-for message in st.session_state.messages:
+for message in st.session_state.messages[1:]:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
@@ -139,31 +135,30 @@ if prompt := st.chat_input("What is up?"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        shown_responce = ""
+        shown_response = ""
         graph_gen = ""
         graphing = False
         assistant_response = LLM_api_call()
         # Simulate stream of response with milliseconds delay
         for chunk in assistant_response.split():
-            print (chunk)
             full_response += chunk + " "
             if (chunk =="LINE_GRAPH_START"):
                 graphing = True
             if (graphing):
                 graph_gen += chunk+ " "
             else:
-                shown_responce += chunk + " "
+                shown_response += chunk + " "
             if (chunk=="LINE_GRAPH_END"):
                 graphing=False
-                shown_responce += "\n"
-                shown_responce += parse_and_generate_graphs_as_datauri(graph_gen)
-                shown_responce += "\n"
+                shown_response += "\n"
+                shown_response += parse_and_generate_graphs_as_datauri(graph_gen)
+                shown_response += "\n"
                 graph_gen = ""
             
             time.sleep(0.05)
             # Add a blinking cursor to simulate typing
-            message_placeholder.markdown(shown_responce + "▌")
-        message_placeholder.markdown(shown_responce)
+            message_placeholder.markdown(shown_response + "▌")
+        message_placeholder.markdown(shown_response)
     # Add assistant response to chat history
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
