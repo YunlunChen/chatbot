@@ -83,7 +83,6 @@ def parse_and_generate_graphs_as_datauri(input_text: str):
 
 st.write("Streamlit loves LLMs! 🤖 [Build your own chat app](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps) in minutes, then make it powerful by adding images, dataframes, or even input widgets to the chat.")
 
-st.caption("Note that this demo app isn't actually connected to any LLMs. Those are expensive ;)")
 
 
 
@@ -112,7 +111,7 @@ if "messages" not in st.session_state:
 
     Only use this format, and include all necessary fields. replace all spaces with _ in the names.
     """
-    st.session_state.messages = [{"role": "assistant", "content": preprompt}]
+    st.session_state.messages = [{"role": "system", "content": preprompt}]
 
     #st.session_state.messages = [{"role": "assistant", "content": "Let's start chatting! 👇"}]
 
